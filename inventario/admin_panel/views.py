@@ -3,8 +3,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from stock.models import inventario
-from django.views.decorators.csrf import csrf_exempt
 from .forms import ProductoForm
+from .forms import CustomLoginForm
 
 @login_required
 def admin_dashboard(request):
@@ -33,18 +33,19 @@ def borrar_producto(request, producto_id):
         return redirect('admin_dashboard')
     return render(request, 'admin_panel/confirmar_borrar.html', {'producto': producto})
 
-@csrf_exempt
 def admin_login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect(reverse('admin_dashboard'))
-        else:
-            error_message = "Usuario o contraseña incorrectos."
+        form = CustomLoginForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user_type = form.cleaned_data.get('user_type')
+            user = authenticate(username=username, password=password)
+            if user is not None and user.user_type == user_type:
+                login(request, user)
+                return redirect(reverse('admin_dashboard'))
+            else:
+                form.add_error(None, "Credenciales inválidas o tipo de usuario incorrecto.")
     else:
-        error_message = ""
-    
-    return render(request, 'admin_panel/login.html', {'error_message': error_message})
+        form = CustomLoginForm()
+    return render(request, 'admin_panel/login.html', {'form': form})

@@ -9,6 +9,10 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+
+import pymysql
+pymysql.install_as_MySQLdb()
+
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -66,7 +70,7 @@ ROOT_URLCONF = 'inventario.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'admin_panel', 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'admin_panel','templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,7 +94,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'inventario',
         'USER': 'root',
-        'PASSWORD': 'root123',
+        'PASSWORD': 'rootsena',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -147,3 +151,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login/'  # Ajusta esto a la URL de tu página de login
 LOGIN_REDIRECT_URL = '/admin-panel/'
+
+AUTH_USER_MODEL = 'admin_panel.CustomUser'
