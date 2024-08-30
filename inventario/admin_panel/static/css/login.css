@@ -43,18 +43,29 @@ body{
     position: absolute;
     left: 0;
     padding: 10px;
+    margin-top: -45px;
     pointer-events: none;
     color: black;
     transition: 0.5s;
 }
 
 
+.inputBox input:valid ~ label,
+.inputBox input:focus ~ label{
+    color: #39A900;
+    transform: translateX(10px) translateY(-7px);
+    font-size: 0.80em;
+    padding: 0  10px;
+    background: white;
+    border-left: 1px solid var(--success);
+    border-right: 1px solid var(--success);
+    letter-spacing: 0.2em;
+}
 
 .inputBox input:valid,
 .inputBox input:focus{
     border: 1px solid var(--success);
 }
-
 
 .imglog{
     width: 300px;
@@ -67,4 +78,3 @@ body{
 h1{
     margin-left: 20px;
 }
-

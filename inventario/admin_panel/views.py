@@ -5,6 +5,7 @@ from django.urls import reverse
 from stock.models import inventario
 from .forms import ProductoForm
 from .forms import CustomLoginForm
+from django.contrib import messages
 
 @login_required
 def admin_dashboard(request):
@@ -40,12 +41,38 @@ def admin_login(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user_type = form.cleaned_data.get('user_type')
-            user = authenticate(username=username, password=password)
-            if user is not None and user.user_type == user_type:
-                login(request, user)
-                return redirect(reverse('admin_dashboard'))
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                if user.user_type == user_type:
+                    login(request, user)
+                    if user_type == 'admin':
+                        return redirect('admin_dashboard')
+                    elif user_type == 'meseros':
+                        return redirect('meseros_dashboard')
+                    elif user_type == 'cocina':
+                        return redirect('cocina_dashboard')
+                    elif user_type == 'caja':
+                        return redirect('caja_dashboard')
+                else:
+                    messages.error(request, "Tipo de usuario incorrecto para estas credenciales.")
             else:
-                form.add_error(None, "Credenciales inválidas o tipo de usuario incorrecto.")
+                messages.error(request, "Usuario o contraseña incorrectos.")
     else:
         form = CustomLoginForm()
-    return render(request, 'admin_panel/login.html', {'form': form})
+    return render(request, 'login.html', {'form': form})
+
+@login_required
+def admin_dashboard(request):
+    return render(request, 'admin_panel/admin_dashboard.html')
+
+@login_required
+def meseros_dashboard(request):
+    return render(request, 'admin_panel/meseros_dashboard.html')
+
+@login_required
+def cocina_dashboard(request):
+    return render(request, 'admin_panel/cocina_dashboard.html')
+
+@login_required
+def caja_dashboard(request):
+    return render(request, 'admin_panel/caja_dashboard.html')
