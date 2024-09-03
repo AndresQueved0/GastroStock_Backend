@@ -22,10 +22,9 @@ from admin_panel import views as admin_panel_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('stock/', include('stock.urls')),
     path('admin-panel/', include('admin_panel.urls')),
-    path('login/', admin_panel_views.admin_login, name='login'), 
-    
+    path('login/', admin_panel_views.admin_login, name='login'),
+    path('admin-panel/', include('admin_panel.urls')),
 ]
 
 if settings.DEBUG:

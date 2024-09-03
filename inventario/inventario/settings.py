@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'stock.apps.StockConfig',
     'admin_panel.apps.AdminPanelConfig',
 ]
 
@@ -139,7 +138,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'stock/static'),
     os.path.join(BASE_DIR, 'admin_panel/static'),
 ]
 
