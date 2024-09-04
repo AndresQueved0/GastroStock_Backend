@@ -56,52 +56,94 @@
         
         <div class="container-fluid">
 <section id="inventario">
-    <h2 class="mt-4 mb-3">Inventario de Productos</h2>
+    {% block content %}
+    <h2>Administracion de inventario</h2>
+    
+    <div id="alertPlaceholder"></div>
+
+    <a href="{% url 'agregar_producto' %}" class="btn btn-success">Agregar Producto</a>
+
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <a href="{% url 'agregar_producto' %}" class="btn btn-primary">Agregar Producto</a>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Cantidad</th>
-            <th>Descripción</th>
-            <th>Precio</th>
-            <th>Categoría</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for producto in productos %}
-        <tr>
-            <td>{{ producto.nombre_producto }}</td>
-            <td>{{ producto.cantidad }}</td>
-            <td>{{ producto.descripcion }}</td>
-            <td>{{ producto.precio_unitario }}</td>
-            <td>{{ producto.categoria }}</td>
-            <td>
-                <a href="{% url 'borrar_producto' producto.id %}" class="btn btn-danger btn-sm">Borrar</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-            
+        <table id="productTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Descripcion</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Fecha de Entrada</th>
+                    <th>Fecha de Expiración</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr data-product-id="{{ producto.id }}">
+                    <td>{{ producto.nombre_producto }}</td>
+                    <td>{{ producto.categoria }}</td>
+                    <td>{{ producto.descripcion }}</td>
+                    <td>{{ producto.cantidad }}</td>
+                    <td>${{ producto.precio_unitario }}</td>
+                    <td>{{ producto.fecha_entrada|date:"Y-m-d" }}</td>
+                    <td>{{ producto.fecha_expiracion|date:"Y-m-d"|default:"-" }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger delete-product" data-id="{{ producto.id }}">Eliminar</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
-        
     </div>
+    
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar este producto?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
 </section>
 <section id="empleados">
     <h2 class="mt-4 mb-3">Empleados</h2>
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <a href="" class="btn btn-primary">Agregar Empleado</a>
+            </table>
+    </div>
 </section>
-
 </div>
+</div>
+{% endblock %}
 
-<script src="{% static 'js/admin_panel.js' %}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+{% block extra_js %}
+<script src="{% static 'js/admin_dashboard.js' %}">
+    console.log('Inline script test');
+    document.addEventListener('DOMContentLoaded', function() {
+        const testButton = document.createElement('button');
+        testButton.textContent = 'Test Button';
+        testButton.addEventListener('click', function() {
+            alert('Test button clicked!');
+        });
+        document.body.appendChild(testButton);
+    });
+</script>
+{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

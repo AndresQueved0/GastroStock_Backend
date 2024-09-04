@@ -108,3 +108,9 @@ hr {
         max-width: 100px;
     }
 }
+
+.btn-success{
+    color: white;
+    background-color: var(--success);
+}
+

@@ -1,36 +1,39 @@
-from django.shortcuts import render, redirect,  get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
-from stock.models import inventario
-from .forms import ProductoForm
-from .forms import CustomLoginForm
+from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from .models import Inventario, Categoria
+from .forms import InventarioForm, CustomLoginForm
+from django.urls import reverse
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 @login_required
 def admin_dashboard(request):
-    productos = inventario.objects.all()
+    productos = Inventario.objects.all()
     context = {
         'productos': productos,
     }
-    return render(request, 'admin_panel/dashboard.html', context)
+    return render(request, 'admin_panel/admin_dashboard.html', context)
 
 @login_required
 def agregar_producto(request):
     if request.method == 'POST':
-        form = ProductoForm(request.POST)
+        form = InventarioForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('admin_dashboard')
+            messages.success(request, 'Producto agregado exitosamente.')
+            return redirect(reverse('admin_dashboard'))  # Usamos reverse() para generar la URL
     else:
-        form = ProductoForm()
+        form = InventarioForm()
     return render(request, 'admin_panel/agregar_producto.html', {'form': form})
 
 @login_required
 def borrar_producto(request, producto_id):
-    producto = get_object_or_404(inventario, id=producto_id)
+    producto = get_object_or_404(Inventario, id=producto_id)
     if request.method == 'POST':
         producto.delete()
+        messages.success(request, 'Producto eliminado exitosamente.')
         return redirect('admin_dashboard')
     return render(request, 'admin_panel/confirmar_borrar.html', {'producto': producto})
 
@@ -63,16 +66,43 @@ def admin_login(request):
 
 @login_required
 def admin_dashboard(request):
-    return render(request, 'admin_panel/admin_dashboard.html')
+    productos = Inventario.objects.all()
+    context = {
+        'productos': productos,
+    }
+    return render(request, 'admin_panel/admin_dashboard.html', context)
 
 @login_required
 def meseros_dashboard(request):
-    return render(request, 'admin_panel/meseros_dashboard.html')
+    productos = Inventario.objects.filter(cantidad__gt=0)
+    context = {
+        'productos': productos,
+    }
+    return render(request, 'admin_panel/meseros_dashboard.html', context)
 
 @login_required
 def cocina_dashboard(request):
-    return render(request, 'admin_panel/cocina_dashboard.html')
+    productos = Inventario.objects.all()
+    context = {
+        'productos': productos,
+    }
+    return render(request, 'admin_panel/cocina_dashboard.html', context)
 
 @login_required
 def caja_dashboard(request):
-    return render(request, 'admin_panel/caja_dashboard.html')
+    productos = Inventario.objects.all()
+    context = {
+        'productos': productos,
+    }
+    return render(request, 'admin_panel/caja_dashboard.html', context)
+
+
+    
+@require_http_methods(["POST"])
+def borrar_producto(request, producto_id):
+    producto = get_object_or_404(Inventario, id=producto_id)
+    try:
+        producto.delete()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
