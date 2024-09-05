@@ -7,10 +7,7 @@ from .forms import InventarioForm, CustomLoginForm
 from django.urls import reverse
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from django.shortcuts import render
 
-def login(request):
-    return render(request, 'login.html')
 
 @login_required
 def admin_dashboard(request):

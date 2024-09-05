@@ -19,17 +19,11 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 from admin_panel import views as admin_panel_views
-from admin_panel import views
 
 urlpatterns = [
-    path('', admin_panel_views.admin_login, name='login'),
+    path('admin/', admin.site.urls),
     path('admin-panel/', include('admin_panel.urls')),
-    path('agregar-producto/', views.agregar_producto, name='agregar_producto'),
-    path('admin/', views.admin_dashboard, name='admin_dashboard'),
-    path('meseros/', views.meseros_dashboard, name='meseros_dashboard'),
-    path('cocina/', views.cocina_dashboard, name='cocina_dashboard'),
-    path('caja/', views.caja_dashboard, name='caja_dashboard'),
-    path('borrar-producto/<int:producto_id>/', views.borrar_producto, name='borrar_producto'),
+    path('login/', admin_panel_views.admin_login, name='login'),
     path('admin-panel/', include('admin_panel.urls')),
 ]
 
