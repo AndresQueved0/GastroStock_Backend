@@ -21,9 +21,9 @@ from django.conf.urls.static import static
 from admin_panel import views as admin_panel_views
 
 urlpatterns = [
+    path('', admin_panel_views.admin_login, name='login'),
     path('admin/', admin.site.urls),
     path('admin-panel/', include('admin_panel.urls')),
-    path('login/', admin_panel_views.admin_login, name='login'),
     path('admin-panel/', include('admin_panel.urls')),
 ]
 
