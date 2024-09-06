@@ -20,10 +20,14 @@
         </div>
         <div class="col-md-6">
             <div class="inputBox">
-                <h2 class="card-title text-center">Login</h2>
+                <h2 class="card-title text-center mb-5">Login</h2>
                     <form method="post">
                         {% csrf_token %}
                         <div class="mb-3">
+                            <div class="mb-3 text-center">
+                            <label for="{{ form.user_type.id_for_label }}">Tipo de Usuario</label>
+                            {{ form.user_type }}
+                        </div>
                             {{ form.username }}
                             <label for="{{ form.username.id_for_label }}">Usuario</label>
                         </div>
@@ -32,10 +36,7 @@
                             <label for="{{ form.password.id_for_label }}" >Contraseña</label>
                         </div>
                     </div>
-                        <div class="mb-3 text-center">
-                            <label for="{{ form.user_type.id_for_label }}">Tipo de Usuario</label>
-                            {{ form.user_type }}
-                        </div>
+                        
                     
                         {% if messages %}
                         {% for message in messages %}
