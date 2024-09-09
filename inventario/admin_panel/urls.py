@@ -11,4 +11,6 @@ urlpatterns = [
     path('cocina/', views.cocina_dashboard, name='cocina_dashboard'),
     path('caja/', views.caja_dashboard, name='caja_dashboard'),
     path('borrar-producto/<int:producto_id>/', views.borrar_producto, name='borrar_producto'),
+    path('registrar-empleado/', views.registrar_empleado, name='registrar_empleado'),
+    path('borrar-empleado/<int:empleado_id>/', views.borrar_empleado, name='borrar_empleado'),
 ]
