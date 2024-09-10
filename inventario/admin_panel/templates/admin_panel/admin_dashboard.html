@@ -37,21 +37,23 @@
     <div class="container-fluid d-flex" style="margin-top: 30px;">
             <div class="col-md-1 mt-5" >
                     <div class="d-flex align-items-center hv">
-                        <a data-content="inventario" id="myLink" class="btn d-flex flex-column align-items-center mb-2">
+                        <a data-content="inventario" id="myLink" class="btn d-flex flex-column align-items-center mb-2 ms-4">
                             <img src="{% static 'img/inventario.png' %}" alt="" class="responsive-img">
                             <span class="fw-bold fs-5">Inventario</span>
                         </a>
                     </div>
                 <hr>
                     <div class="d-flex align-items-center hv">
-                        <a data-content="empleados" id="myLink" class="btn d-flex flex-column align-items-center mb-2">
+                        <a data-content="empleados" id="myLink" class="btn d-flex flex-column align-items-center mb-2 ms-4">
                             <img src="{% static 'img/empleados.png' %}" alt="" class="responsive-img">
                             <span class="fw-bold fs-5">Empleados</span>
                         </a>
                     </div>
             </div>
 
-        <div class="col-md-11 mt-5" style="margin: 0;">
+
+        <div class="col-md-11 mt-5 ms-5" style="margin: 0;">
+
             <section id="inventario">
                 {% block content %}
                 <h2 class="mt-5 mb-3">Administracion de inventario</h2>
@@ -112,13 +114,18 @@
             </section>
             
             <section id="empleados">
-                <h2 class="mt-4 mb-3">Administración de Empleados</h2>
-                <a href="{% url 'registrar_empleado' %}" class="btn btn-success mb-3">Registrar Nuevo Empleado</a>
+
+                <h2 class="mt-5">Administración de Empleados</h2>
+
+                
+                <a href="{% url 'registrar_empleado' %}" class="btn btn-success mb-3"> Nuevo Empleado </a>
+                
+
                 <div id="empleadosContainer" class="row">
                     {% for empleado in empleados %}
-                    <div class="col">
-                        <div class="card responsive-card" style="width: 21rem;" data-empleado-id="{{ empleado.id }}">
-                            <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+                    <div class="col-2">
+                        <div class="card responsive-card" style="width: 20rem;" data-empleado-id="{{ empleado.id }}">
+                            <div class="d-flex justify-content-center align-items-center" style="height: 250px;">
                                 {% if empleado.foto %}
                                     <img src="{{ empleado.foto.url }}" class="img-fluid" alt="{{ empleado.nombre }} {{ empleado.apellido }}">
                                 {% else %}
@@ -169,7 +176,6 @@
 <script src="{% static 'js/admin_dashboard.js' %}"></script>
 {% endblock %}
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
