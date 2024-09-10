@@ -3,6 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .models import CustomUser
 from .models import Inventario
 from django.utils import timezone
+from .models import Empleados
 
 # Formulario de autenticación personalizado
 
@@ -43,3 +44,22 @@ class InventarioForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Establecer la fecha actual como valor inicial para fecha_entrada
         self.fields['fecha_entrada'].initial = timezone.now().date()
+
+
+
+class EmpleadoForm(forms.ModelForm):
+    class Meta:
+        model = Empleados
+        fields = ['nombre', 'apellido', 'puesto', 'telefono', 'fecha_contratacion', 'foto']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'apellido': forms.TextInput(attrs={'class': 'form-control'}),
+            'puesto': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'fecha_contratacion': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'foto': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['fecha_contratacion'].initial = timezone.now().date()

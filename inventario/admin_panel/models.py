@@ -65,3 +65,19 @@ class Inventario(models.Model):
 
     def __str__(self):
         return f'{self.nombre_producto} - Cantidad: {self.cantidad}'
+
+class Empleados(models.Model):
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=15)
+    direccion = models.TextField(blank=True)
+    puesto = models.CharField(max_length=100)
+    fecha_contratacion = models.DateField(default=timezone.now)
+    fecha_terminacion = models.DateField(null=True, blank=True)
+    foto = models.ImageField(upload_to='empleados_fotos/', null=True, blank=True)
+
+    class Meta:
+        ordering = ['nombre', 'apellido']
+
+    def __str__(self):
+        return f'{self.nombre} {self.apellido} - {self.puesto}'

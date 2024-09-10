@@ -2,20 +2,33 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from .models import Inventario, Categoria
-from .forms import InventarioForm, CustomLoginForm
+from .models import Inventario, Categoria, Empleados
+from .forms import InventarioForm, CustomLoginForm, EmpleadoForm
 from django.urls import reverse
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 
-
 @login_required
 def admin_dashboard(request):
     productos = Inventario.objects.all()
+    empleados = Empleados.objects.all()
     context = {
         'productos': productos,
+        'empleados': empleados,
     }
-    return render(request, 'admin_panel/admin_dashboard.html', context)
+    return render(request, 'admin_dashboard.html', context)
+
+def registrar_empleado(request):
+    if request.method == 'POST':
+        form = EmpleadoForm(request.POST,request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Empleado registrado con éxito.')
+            return redirect('admin_dashboard')  # Asegúrese de tener esta URL definida
+    else:
+        form = EmpleadoForm()
+    
+    return render(request, 'admin_panel/registro_empleados.html', {'form': form})
 
 @login_required
 def agregar_producto(request):
@@ -68,10 +81,13 @@ def admin_login(request):
 @login_required
 def admin_dashboard(request):
     productos = Inventario.objects.all()
+    empleados = Empleados.objects.all()
     context = {
         'productos': productos,
+        'empleados': empleados,
     }
     return render(request, 'admin_panel/admin_dashboard.html', context)
+
 
 @login_required
 def meseros_dashboard(request):
@@ -107,3 +123,13 @@ def borrar_producto(request, producto_id):
         return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+
+@require_http_methods(["POST"])
+def borrar_empleado(request, empleado_id):
+    try:
+        empleado = get_object_or_404(Empleados, id=empleado_id)
+        empleado.delete()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        print(f"Error al eliminar empleado: {str(e)}")  # Log del error
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)

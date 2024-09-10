@@ -1,3 +1,8 @@
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 :root {
     --success: #39A900;
 }
@@ -6,9 +11,7 @@
     color: var(--success);
 }
 
-.btn {
-    border: none;
-}
+
 
 .navbar::after {
     content: "";
@@ -36,7 +39,7 @@ hr {
     padding: 10px;
 }
 
-.sidebar .btn {
+.sidebar {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -61,27 +64,12 @@ hr {
     color: white;
     opacity: 0.5; /* Ajusta este valor para hacer el hover más transparente */
 }
-.d-flex {
-    display: flex;
-}
 
 .sidebar {
     width: 250px; /* Ajusta el ancho del sidebar según tus necesidades */
     padding: 10px; /* Espaciado interno opcional */
 }
 
-.container1 {
-    flex-grow: 1; /* Permite que el contenedor ocupe el espacio restante */
-    padding-top: 10px; /* Espaciado interno opcional */
-    max-width: 100%; /* Asegura que el contenedor no exceda el ancho de la pantalla */
-    overflow-x: hidden; /* Oculta cualquier contenido que se desborde horizontalmente */
-    padding: 0 15px;
-}
-.centered-img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
 .responsive-icon {
     width: 80%;
     max-width: 50px;
@@ -98,19 +86,23 @@ hr {
 
 .responsive-card{
     width: 100%;
-    max-width: 200px;
-    height: auto;
+    max-width: 500px;
 }
 
 @media (max-width: 414px) {
     .responsive-card{
         width: 100%;
-        max-width: 100px;
+        max-width: 50px;
     }
 }
 
 .btn-success{
     color: white;
     background-color: var(--success);
+}
+
+
+.bg-white {
+    background-color: white;
 }
 
