@@ -2,7 +2,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const links = document.querySelectorAll('#myLink');
     const sections = document.querySelectorAll('section');
 
-    // Función para mostrar una sección y ocultar las demás
+    // Función para obtener el valor del parámetro de la URL
+    function getURLParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    // Función para mostrar una sección específica
     function showSection(sectionId) {
         sections.forEach(section => {
             if (section.id === sectionId) {
@@ -11,9 +17,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 section.style.display = 'none';
             }
         });
+        localStorage.setItem('currentSection', sectionId);
     }
 
-    // Añadir evento click a cada enlace
+    // Obtener la sección desde la URL o desde el localStorage
+    const sectionFromURL = getURLParameter('section');
+    const initialSection = sectionFromURL || localStorage.getItem('currentSection');
+
+    // Si hay una sección inicial, mostrarla
+    if (initialSection) {
+        showSection(initialSection);
+    } else {
+        // Si no hay sección inicial, no mostrar ninguna sección
+        sections.forEach(section => section.style.display = 'none');
+    }
+
+    // Actualizar el campo oculto en los formularios
+    const currentSectionInputs = document.querySelectorAll('input[name="current_section"]');
+    currentSectionInputs.forEach(input => {
+        input.value = initialSection;
+    });
+
+    // Manejar la navegación por los enlaces
     links.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -21,10 +46,74 @@ document.addEventListener('DOMContentLoaded', function() {
             showSection(sectionToShow);
         });
     });
+});
 
-    // Mostrar la sección de inventario por defecto
-    showSection('inventario');
-    })
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.delete-product');
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteProductoConfirmModal'));
+        let productIdToDelete = null;
+    
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                productIdToDelete = this.getAttribute('data-id');
+                deleteModal.show();
+            });
+        });
+    
+        document.getElementById('confirmDeleteProducto').addEventListener('click', function() {
+            if (productIdToDelete) {
+                deleteProduct(productIdToDelete);
+            }
+        });
+    
+        function deleteProduct(productoId) {
+            fetch(`/admin-panel/borrar-producto/${productoId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.querySelector(`tr[data-product-id="${productoId}"]`);
+                    if (row) {
+                        row.remove();
+                    }
+                    // Cerrar el modal
+                    deleteModal.hide();  // Aquí se cierra el modal
+                    showAlert(data.type, data.message, 'Producto');
+                } else {
+                    console.error('Error al eliminar el producto:', data.message);
+                    showAlert(data.type, data.message, 'Producto');
+                }
+            })
+            .catch(error => {
+                console.error('Error al procesar la solicitud:', error);
+                showAlert('error', 'Error al procesar la solicitud de eliminación.', 'Producto');
+            });
+        }
+    
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+    
 
     document.addEventListener('DOMContentLoaded', function() {
         const deleteButtons = document.querySelectorAll('.delete-empleado');
@@ -60,18 +149,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (card) {
                         card.remove();
                     }
-                    deleteModal.hide();
-                    showAlert('success', 'Empleado eliminado con éxito.');
+                    showAlert(data.type, data.message, 'Empleado');
                 } else {
-                    console.error('Error al eliminar el empleado:', data.error);
-                    showAlert('danger', `Error al eliminar el empleado: ${data.error}`);
+                    console.error('Error al eliminar el empleado:', data.message);
+                    showAlert(data.type, data.message, 'Empleado');
                 }
             })
             .catch(error => {
                 console.error('Error al procesar la solicitud:', error);
-                showAlert('danger', 'Error al procesar la solicitud de eliminación.');
+                showAlert('error', 'Error al procesar la solicitud de eliminación.', 'Empleado');
             });
         }
+        
     
         function getCookie(name) {
             let cookieValue = null;
@@ -87,22 +176,33 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return cookieValue;
         }
-    
-        function showAlert(type, message) {
-            const alertPlaceholder = document.getElementById('alertPlaceholderEmpleado');
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = [
-                `<div class="alert alert-${type} alert-dismissible" role="alert">`,
-                `   <div>${message}</div>`,
-                '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-                '</div>'
-            ].join('');
-            alertPlaceholder.append(wrapper);
-    
-            // Opcional: hacer desaparecer la alerta después de 5 segundos
-            setTimeout(() => {
-                const alert = bootstrap.Alert.getOrCreateInstance(wrapper.firstChild);
-                alert.close();
-            }, 5000);
+    });
+
+    function showAlert(type, message, category = 'General') {
+        const alertPlaceholder = document.getElementById(`alertPlaceholder${category}`);
+        if (!alertPlaceholder) {
+            console.error(`No se encontró el contenedor de alertas para la categoría ${category}`);
+            return;
         }
-    }); 
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = [
+            `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+            `   <div>${message}</div>`,
+            '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+            '</div>'
+        ].join('');
+        alertPlaceholder.append(wrapper);
+    
+        // Opcional: hacer desaparecer la alerta después de 5 segundos
+        setTimeout(() => {
+            const alert = bootstrap.Alert.getOrCreateInstance(wrapper.firstChild);
+            alert.close();
+        }, 5000);
+    }
+    
+    setTimeout(function() {
+        var messageContainer = document.getElementById('message-container');
+        if (messageContainer) {
+            messageContainer.style.display = 'none';
+        }
+    }, 3000);

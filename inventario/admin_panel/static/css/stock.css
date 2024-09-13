@@ -24,7 +24,7 @@ body {
 }
 
 hr {
-    width: 80%;
+    width: 100%;
     margin-top: 0;
     position: relative;
     margin-left: 20px;
@@ -32,6 +32,10 @@ hr {
     background-color: var(--success); /* Asegúrate de que el color coincida con tu diseño */
     border: none;
     opacity: 1;
+}
+
+.btn{
+    border: none;
 }
 
 .sidebar {

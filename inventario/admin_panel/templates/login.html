@@ -38,13 +38,13 @@
                     </div>
                         
                     
-                        {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-danger">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
+                    {% if messages %}
+                    {% for message in messages %}
+                        {% if message.extra_tags == 'login_error' %}
+                            <div class="alert alert-danger">{{ message }}</div>
                         {% endif %}
+                    {% endfor %}
+                {% endif %}
                         <div class="d-flex aling-item-center justify-content-center">
                             <button type="submit" class="btn btn-success fw-bold">Iniciar Sesión</button>
                         </div>
