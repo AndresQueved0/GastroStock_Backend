@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/stock.css' %}">
     <link rel="icon" href="{% static 'img/logo.png'%}">
 </head>
-<body>
+<body data-initial-section="{{ initial_section }}">
 
     <nav class="navbar bg-white fixed-top navbar-expand-lg bg-body-ligth">
         <div class="container-fluid">
@@ -37,14 +37,14 @@
     <div class="container-fluid d-flex" style="margin-top: 30px;">
             <div class="col-md-1 mt-5" >
                     <div class="d-flex align-items-center hv">
-                        <a data-content="inventario" id="myLink" class="btn d-flex flex-column align-items-center mb-2 ms-4">
+                        <a data-content="inventario" id="myLink" class="btn d-flex flex-column align-items-center mb-2 ms-3">
                             <img src="{% static 'img/inventario.png' %}" alt="" class="responsive-img">
                             <span class="fw-bold fs-5">Inventario</span>
                         </a>
                     </div>
                 <hr>
                     <div class="d-flex align-items-center hv">
-                        <a data-content="empleados" id="myLink" class="btn d-flex flex-column align-items-center mb-2 ms-4">
+                        <a data-content="empleados" id="myLink" class="btn d-flex flex-column align-items-center mb-2 ms-3">
                             <img src="{% static 'img/empleados.png' %}" alt="" class="responsive-img">
                             <span class="fw-bold fs-5">Empleados</span>
                         </a>
@@ -52,13 +52,21 @@
             </div>
 
 
-        <div class="col-md-11 mt-5 ms-5" style="margin: 0;">
+        <div class="col-md-10 mt-5 ms-5" style="margin: 0;">
 
             <section id="inventario">
                 {% block content %}
                 <h2 class="mt-5 mb-3">Administracion de inventario</h2>
-                
-                <div id="alertPlaceholder"></div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if message.extra_tags == 'producto_success' %}
+                            <div class="alert alert-success">{{ message }}</div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                <div id="alertPlaceholderProducto"></div>
 
                 <a href="{% url 'agregar_producto' %}" class="btn btn-success">Agregar Producto</a>
 
@@ -94,7 +102,9 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+
+                <div class="modal fade" id="deleteProductoConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -106,7 +116,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar</button>
+                            <button type="button" class="btn btn-danger" id="confirmDeleteProducto">Eliminar</button>
                         </div>
                     </div>
                 </div>
@@ -117,13 +127,24 @@
 
                 <h2 class="mt-5">Administración de Empleados</h2>
 
-                
+                {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            {% if message.extra_tags == 'empleado_success' %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+                <div id="alertPlaceholderEmpleado"></div>
+
                 <a href="{% url 'registrar_empleado' %}" class="btn btn-success mb-3"> Nuevo Empleado </a>
                 
 
                 <div id="empleadosContainer" class="row">
                     {% for empleado in empleados %}
-                    <div class="col-2">
+                    <div class="col-4 gap-1 mt-3">
                         <div class="card responsive-card" style="width: 20rem;" data-empleado-id="{{ empleado.id }}">
                             <div class="d-flex justify-content-center align-items-center" style="height: 250px;">
                                 {% if empleado.foto %}
@@ -138,13 +159,14 @@
                                 <p class="card-text"><strong>Teléfono:</strong> {{ empleado.telefono }}</p>
                                 <p class="card-text"><strong>Fecha de Contratación:</strong> {{ empleado.fecha_contratacion|date:"d/m/Y" }}</p>
                             </div>
-                            <div class="card-footer">
+                            <div class="card-footer border-none text-center">
                                 <button class="btn btn-danger delete-empleado" data-id="{{ empleado.id }}">Eliminar</button>
+                                <a href="{% url 'editar_empleado' empleado.id %}" class="btn btn-success">Editar</a>
                             </div>
                         </div>
                     </div>
                     {% empty %}
-                    <div class="col-12">
+                    <div class="col-10">
                         <p>No hay empleados registrados.</p>
                     </div>
                     {% endfor %}

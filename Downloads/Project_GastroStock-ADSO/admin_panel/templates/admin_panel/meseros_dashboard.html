@@ -1,0 +1,287 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Meseros</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/stock.css' %}">
+    <link rel="icon" href="{% static 'img/logo.png'%}">
+    {% block extra_css %}
+    <style>
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: auto;
+            left: 0;
+            background-color: white;
+            padding-top: 20px;
+            transition: 0.3s;
+            z-index: 1000;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            padding-top: 76px;
+            transition: 0.3s;
+        }
+        .toggle-btn {
+            display: none;
+            position: fixed;
+            left: 10px;
+            top: 70px;
+            z-index: 1001;
+            background-color: #00FF0000;
+            color: rgb(2, 2, 2);
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -250px;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .content {
+                margin-left: 0;
+            }
+            .toggle-btn {
+                display: block;
+            }
+        }
+    </style>
+        {% endblock %}
+</head>
+<body>
+    <nav class="navbar bg-white fixed-top navbar-expand-lg bg-body-ligth">
+        <div class="container-fluid">
+            <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+            <a class="navbar-brand" href="#">
+                <div class="ms-3">
+                    <img src="{% static 'img/logo.png' %}" alt="" class="responsive-icon">
+                    <span class="fw-bold">MeserosGastro</span>
+                </div>
+            </a>
+            <div class="dropdown iconos">
+                <button class="btn">
+                    <img src="{% static 'img/notificacion.png' %}" alt="" class="responsive-icon">
+                </button>
+                <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{% static 'img/usuario.png' %}" alt="" class="responsive-icon">
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="#">Perfil</a></li>
+                    <li><a class="dropdown-item" href="{% url 'admin_login' %}">Cerrar sesion</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="d-flex">
+        <div class="sidebar col-md-1 mt-5 me-5" id="sidebar">
+            <div class="d-flex align-items-center hv">
+                <a data-content="mesas" id="myLink" class="btn d-flex flex-column align-items-center mb-2 ms-3">
+                    <img src="{% static 'img/mesa-de-comedor.png' %}" alt="" class="" width="100px">
+                    <span class="fw-bold fs-5">Mesas</span>
+                </a>
+            </div>
+            <hr>
+            <div class="d-flex align-items-center hv">
+                <a data-content="pedidos" id="myLink" class="btn d-flex flex-column align-items-center mb-2 ms-3">
+                    <img src="{% static 'img/pedido-en-linea.png' %}" alt="" class="" width="100px">
+                    <span class="fw-bold fs-5">Pedidos</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="container-fluid">
+            <section id="mesas">
+                
+                {% block content %}
+                <div class="d-flex mt-3">
+                    <h2 class=" mb-3">Mesas - Panel de Meseros</h2>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="ubicacion-select" class="form-label">Filtrar por ubicación:</label>
+                    <select id="ubicacion-select" class="form-select" style="width: 20%;">
+                        <option value="">Todas las ubicaciones</option>
+                        {% for ubicacion in ubicaciones %}
+                            <option value="{{ ubicacion.id }}" {% if ubicacion.id|stringformat:"s" == ubicacion_seleccionada %}selected{% endif %}>
+                                {{ ubicacion.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+        
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if message.extra_tags == 'mesa_success' %}
+                            <div class="alert alert-success">{{ message }}</div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                
+                <div id="alertPlaceholderMesa"></div>
+                <div class="row" id="mesasContainer">
+                    {% for mesa in mesas %}
+                    <div class="col-md-4 mb-4 mt-3">
+                        <div class="card" style="width: 13rem; cursor: pointer;" data-mesa-id="{{ mesa.id }}" data-bs-toggle="modal" data-bs-target="#pedidoModal" data-mesa-nombre="{{ mesa.nombre }}" data-mesa-ubicacion="{{ mesa.ubicacion }}" onclick="actualizarInfoMesa('{{ mesa.id }}', '{{ mesa.nombre }}', '{{ mesa.ubicacion }}')">
+                            <div class="d-flex justify-content-center align-items-center" style="height: 150px; overflow: hidden;">
+                                <img src="{% static 'img/mesa-de-comedor.png' %}" class="img-fluid" alt="Foto por defecto" style="width: 100%; object-fit: cover;">
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-center">{{ mesa.nombre }}</h5>
+                                <p class="card-text"><strong>Ubicación:</strong> <span class="mesa-ubicacion">{{ mesa.ubicacion }}</span></p>
+                            </div>
+                            <div class="card-footer border-none text-center">
+                                <p class="card-text"><strong>Estado:</strong> {{ mesa.get_estado_display }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <p>No hay mesas registradas para esta ubicación.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section id="pedidos">
+                <div class="d-flex mt-3">
+                    
+                    <h2 class="mt-4 mb-3">Pedidos -  Panel de meseros</h2>
+                </div>
+
+                <div class="row" id="pedidosContainer">
+                    {% for pedido in pedidos %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-header {% if pedido.estado == 'activo' %}bg-primary{% else %}bg-success{% endif %} text-white">
+                                <h5 class="card-title mb-0">Pedido #{{ pedido.id }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Mesa:</strong> {{ pedido.mesa.nombre }}</p>
+                                <p><strong>Ubicación:</strong> {{ pedido.mesa.ubicacion }}</p>
+                                <p><strong>Fecha:</strong> {{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</p>
+                                <p><strong>Item:</strong> {{ pedido.item_menu.nombre }}</p>
+                                <p><strong>Cantidad:</strong> {{ pedido.cantidad }}</p>
+                                <p><strong>Precio Unitario:</strong> ${{ pedido.precio_unitario }}</p>
+                                <p><strong>Total:</strong> ${{ pedido.precio_total }}</p>
+                                <p><strong>Estado:</strong> {{ pedido.get_estado_display }}</p>
+                            </div>
+                            {% if pedido.estado == 'activo' %}
+                            <div class="card-footer">
+                                <button class="btn btn-success btn-sm marcar-pagado" data-pedido-id="{{ pedido.id }}">Marcar como Pagado</button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <p>No hay pedidos registrados en este momento.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+        </div>
+
+        
+
+    </div>
+
+    <!-- Modal para toma de pedidos -->
+    <div class="modal fade" id="pedidoModal" tabindex="-1" aria-labelledby="pedidoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pedidoModalLabel">Tomar Pedido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3>MENÚ</h3>
+                            <ul class="nav nav-tabs" id="menuTabs" role="tablist">
+                                {% for categoria in categorias_menu %}
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link {% if forloop.first %}active{% endif %}" id="tab-{{ categoria.id }}" data-bs-toggle="tab" data-bs-target="#categoria-{{ categoria.id }}" type="button" role="tab">
+                                        {{ categoria.nombre }}
+                                    </button>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            <div class="tab-content mt-3" id="menuTabContent">
+                                {% for categoria in categorias_menu %}
+                                <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="categoria-{{ categoria.id }}" role="tabpanel">
+                                    <div class="row">
+                                        {% for item in categoria.items.all %}
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card" style="width: 14rem;">
+                                                <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 150px; overflow: hidden;">
+                                                {% if item.imagen %}
+                                                <img src="{{ item.imagen.url }}" alt="{{ item.nombre }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                                {% endif %}
+                                            </div>
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ item.nombre }}</h5>
+                                                    <p class="card-text m-0"><strong>{{ item.precio_formateado }}</strong></p>
+                                                    <button class="btn btn-primary btn-sm agregar-item m-0" data-id="{{ item.id }}" data-nombre="{{ item.nombre }}" data-precio="{{ item.precio }}">Agregar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h3>PEDIDO ACTUAL</h3>
+                            <div id="pedido-actual">
+                                <p><span id="mesa-numero"></span> - <span id="mesa-ubicacion"></span></p>
+                                <ul id="lista-pedidos">
+                                    <!-- Aquí se agregarán los items del pedido -->
+                                </ul>
+                                <p>Total a pagar: $<span id="total-pagar">0.00</span></p>
+                            </div>
+                            <button id="generar-ticket" class="btn btn-primary">Generar ticket</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="{% static 'js/meseros.js' %}"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("active");
+            document.querySelector(".content").classList.toggle("margin-left-0");
+        }
+
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const content = this.getAttribute('data-content');
+                document.querySelectorAll('section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.getElementById(content).style.display = 'block';
+                if (window.innerWidth <= 768) {
+                    toggleSidebar();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
